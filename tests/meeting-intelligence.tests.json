@@ -1,0 +1,62 @@
+[
+  {
+    "input": "Process this audio file of my meeting with Brightfield Media",
+    "expected": {
+      "action": "meeting-intelligence",
+      "transcript": "Transcribed meeting with Tom Chen about AI workflow implementation",
+      "output": {
+        "summary": "Discussed AI workflow implementation for Brightfield Media",
+        "decisions": ["Agreed on June 1 start date"],
+        "action_items": ["Tom Chen: Finalize requirements by May 20"],
+        "open_questions": ["Need to confirm budget details"]
+      }
+    }
+  },
+  {
+    "input": "Analyze this transcript from my meeting with Tom Chen",
+    "expected": {
+      "action": "meeting-intelligence",
+      "transcript": "Meeting transcript about project requirements",
+      "output": {
+        "summary": "Reviewed project requirements and timeline",
+        "decisions": ["Approved initial scope"],
+        "action_items": ["Scott: Review contract by May 10"],
+        "open_questions": ["Need to clarify payment terms"]
+      }
+    }
+  },
+  {
+    "input": "Prep me for my 2pm meeting with Brightfield Media",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "Last contact: May 1, discussed initial proposal",
+        "recent_emails": ["May 3: Follow-up about timeline"],
+        "open_items": ["Brightfield Project: Finalize requirements"],
+        "previous_meeting": "April 25: Initial proposal discussion"
+      }
+    }
+  },
+  {
+    "input": "Show me the prep for my 10am meeting with Tom Chen",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "Active client since March 15",
+        "recent_emails": ["May 2: Project update", "April 30: Budget discussion"],
+        "open_items": ["AI Workflow: Finalize implementation plan"],
+        "previous_meeting": "April 20: Requirements gathering"
+      }
+    }
+  },
+  {
+    "input": "Log that I sent a proposal to Brightfield Media on May 1",
+    "expected": {
+      "action": "follow-up-sequencer",
+      "output": {
+        "follow_up_created": true,
+        "next_action": "May 4 (Day 3 nudge)"
+      }
+    }
+  }
+]

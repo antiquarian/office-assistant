@@ -1,0 +1,54 @@
+[
+  {
+    "input": "Log that I sent a proposal to Brightfield Media on May 1",
+    "expected": {
+      "action": "follow-up-sequencer",
+      "output": {
+        "follow_up_created": true,
+        "next_action": "May 4 (Day 3 nudge)"
+      }
+    }
+  },
+  {
+    "input": "Send the Day 3 nudge for Brightfield Media",
+    "expected": {
+      "action": "follow-up-sequencer",
+      "output": {
+        "email_draft": "Hi Tom, just following up on our proposal from May 1. Are you available for a quick call next week?",
+        "next_action": "May 8 (Day 7 nudge)"
+      }
+    }
+  },
+  {
+    "input": "Send the Day 7 nudge for Brightfield Media",
+    "expected": {
+      "action": "follow-up-sequencer",
+      "output": {
+        "email_draft": "Hi Tom, just checking in again about our proposal. We're happy to answer any questions you might have.",
+        "next_action": "May 15 (Day 14 final touch)"
+      }
+    }
+  },
+  {
+    "input": "Send the final follow-up for Brightfield Media",
+    "expected": {
+      "action": "follow-up-sequencer",
+      "output": {
+        "email_draft": "Hi Tom, this is our final follow-up about the proposal. We'd love to hear your thoughts before moving on.",
+        "status": "Sent",
+        "note": "Flagged for special attention"
+      }
+    }
+  },
+  {
+    "input": "The client said no to our proposal",
+    "expected": {
+      "action": "follow-up-sequencer",
+      "output": {
+        "status": "Lost",
+        "crm_log_updated": true,
+        "sequence_closed": true
+      }
+    }
+  }
+]

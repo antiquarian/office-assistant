@@ -1,0 +1,62 @@
+[
+  {
+    "input": "Prep me for my 2pm meeting with Brightfield Media",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "Last contact: May 1, discussed initial proposal",
+        "recent_emails": ["May 3: Follow-up about timeline"],
+        "open_items": ["Brightfield Project: Finalize requirements"],
+        "previous_meeting": "April 25: Initial proposal discussion"
+      }
+    }
+  },
+  {
+    "input": "Show me the prep for my 10am meeting with Tom Chen",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "Active client since March 15",
+        "recent_emails": ["May 2: Project update", "April 30: Budget discussion"],
+        "open_items": ["AI Workflow: Finalize implementation plan"],
+        "previous_meeting": "April 20: Requirements gathering"
+      }
+    }
+  },
+  {
+    "input": "Prep me for the client onboarding meeting",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "New prospect, first contact May 1",
+        "recent_emails": ["May 3: Introductory email"],
+        "open_items": ["Onboarding: Schedule discovery call"],
+        "previous_meeting": "None"
+      }
+    }
+  },
+  {
+    "input": "Prepare for my meeting with the accounting team",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "Regular internal meeting, last on April 20",
+        "recent_emails": ["May 2: Financial report draft"],
+        "open_items": ["Q2 Budget: Finalize numbers"],
+        "previous_meeting": "April 20: Q2 planning"
+      }
+    }
+  },
+  {
+    "input": "Prep me for the project review meeting",
+    "expected": {
+      "action": "meeting-prep",
+      "output": {
+        "crm_notes": "Project in progress since March 1",
+        "recent_emails": ["May 4: Status update", "April 30: Milestone achieved"],
+        "open_items": ["Deliverable: Final testing phase"],
+        "previous_meeting": "April 25: Mid-project review"
+      }
+    }
+  }
+]

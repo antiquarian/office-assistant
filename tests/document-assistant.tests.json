@@ -1,0 +1,74 @@
+[
+  {
+    "id": "DOC-001",
+    "description": "Draft a proposal from template",
+    "skill": "document-assistant",
+    "skillMd": "skills/document-assistant/SKILL.md",
+    "tags": ["smoke"],
+    "prompt": "Draft a proposal for Brightfield Media for a 3-month AI workflow engagement at $5,000 per month. Contact is Tom Chen.",
+    "assertions": [
+      { "type": "dir_exists",    "path": "documents/drafts", "description": "Drafts directory exists" },
+      { "type": "file_matches_regex", "path": "documents/drafts", "pattern": "proposal.*\\.md$", "description": "Proposal file created in drafts" },
+      { "type": "response_contains", "text": "Brightfield Media", "description": "Client name in response" },
+      { "type": "response_contains", "text": "5,000", "description": "Fee amount in response" }
+    ]
+  },
+  {
+    "id": "DOC-002",
+    "description": "Draft a follow-up email after a meeting",
+    "skill": "document-assistant",
+    "skillMd": "skills/document-assistant/SKILL.md",
+    "tags": ["smoke"],
+    "prompt": "Draft a follow-up email to Tom Chen at Brightfield Media after our call today where we discussed the AI rollout timeline.",
+    "assertions": [
+      { "type": "response_contains", "text": "Tom", "description": "Recipient name in draft", "caseSensitive": false },
+      { "type": "response_contains", "text": "Brightfield", "description": "Company name in draft", "caseSensitive": false }
+    ]
+  },
+  {
+    "id": "DOC-003",
+    "description": "Draft meeting notes",
+    "skill": "document-assistant",
+    "skillMd": "skills/document-assistant/SKILL.md",
+    "prompt": "Draft meeting notes for today's kickoff call with Brightfield Media. Attendees: Tom Chen and me. We discussed project scope, timeline (3 months), and agreed to start June 1.",
+    "assertions": [
+      { "type": "dir_exists",    "path": "documents/drafts", "description": "Drafts directory exists" },
+      { "type": "response_contains", "text": "June 1", "description": "Start date in notes", "caseSensitive": false },
+      { "type": "response_contains", "text": "Brightfield", "description": "Client name in notes", "caseSensitive": false }
+    ]
+  },
+  {
+    "id": "DOC-004",
+    "description": "Draft a scope of work",
+    "skill": "document-assistant",
+    "skillMd": "skills/document-assistant/SKILL.md",
+    "prompt": "Draft a scope of work for the Brightfield Media AI workflow engagement. 3 months, deliverables: workflow audit, AI tool recommendations, implementation support.",
+    "assertions": [
+      { "type": "response_contains", "text": "Brightfield", "description": "Client name present", "caseSensitive": false },
+      { "type": "response_contains", "text": "deliverable", "description": "Deliverables section present", "caseSensitive": false }
+    ]
+  },
+  {
+    "id": "DOC-005",
+    "description": "Draft a status report",
+    "skill": "document-assistant",
+    "skillMd": "skills/document-assistant/SKILL.md",
+    "prompt": "Draft a status report for the Brightfield AI Rollout project. Week 4 of 12. Status: on track. Completed: workflow audit. In progress: tool selection. Blockers: none.",
+    "assertions": [
+      { "type": "response_contains", "text": "Week 4", "description": "Week number present", "caseSensitive": false },
+      { "type": "response_contains", "text": "on track", "description": "Status present", "caseSensitive": false },
+      { "type": "response_contains", "text": "workflow audit", "description": "Completed item present", "caseSensitive": false }
+    ]
+  },
+  {
+    "id": "DOC-006",
+    "description": "Template placeholders are filled — no unfilled {{}} in output",
+    "skill": "document-assistant",
+    "skillMd": "skills/document-assistant/SKILL.md",
+    "tags": ["guardrail"],
+    "prompt": "Draft a proposal for Brightfield Media for a 3-month AI workflow engagement at $5,000 per month.",
+    "assertions": [
+      { "type": "response_contains", "text": "Brightfield", "description": "Client name filled in", "caseSensitive": false }
+    ]
+  }
+]
