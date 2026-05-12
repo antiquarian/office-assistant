@@ -1,0 +1,77 @@
+[
+  {
+    "id": "EMAIL-001",
+    "description": "List important unread messages from the inbox snapshot",
+    "skill": "email-assistant",
+    "skillMd": "skills/email-assistant/SKILL.md",
+    "prompt": "Check my inbox using the snapshot and show me the most important unread messages.",
+    "setupFiles": {
+      "inbox-snapshot.md": "# Inbox Snapshot\n\n- 2026-05-08 08:15 | From: Jane Smith <jane@acme.com> | Subject: Urgent contract redlines | Status: unread\n- 2026-05-08 09:20 | From: Bank Ops <ops@bank.example> | Subject: Business account documents needed | Status: unread\n- 2026-05-08 10:05 | From: Newsletter <news@example.com> | Subject: Weekly AI roundup | Status: unread\n"
+    },
+    "assertions": [
+      { "type": "response_contains", "text": "Jane Smith" },
+      { "type": "response_contains", "text": "Urgent contract redlines" },
+      { "type": "response_contains", "text": "Business account documents needed" }
+    ],
+    "tags": ["smoke"]
+  },
+  {
+    "id": "EMAIL-002",
+    "description": "Draft a reply from a saved thread file",
+    "skill": "email-assistant",
+    "skillMd": "skills/email-assistant/SKILL.md",
+    "prompt": "Draft a reply to the Acme redlines thread saying we will send the revised SOW tomorrow afternoon.",
+    "setupFiles": {
+      "email-threads/acme-redlines.md": "Subject: Acme redlines\n\nJane Smith: Can you send the revised SOW tomorrow? We need it before close of business.\n"
+    },
+    "assertions": [
+      { "type": "file_exists", "path": "documents/drafts/email-reply-acme-redlines.md" },
+      { "type": "file_contains", "path": "documents/drafts/email-reply-acme-redlines.md", "text": "revised SOW" },
+      { "type": "file_contains", "path": "documents/drafts/email-reply-acme-redlines.md", "text": "tomorrow afternoon" },
+      { "type": "response_contains", "text": "not been sent" }
+    ],
+    "tags": ["smoke"]
+  },
+  {
+    "id": "EMAIL-003",
+    "description": "Summarize a thread into topic, open question, and next action",
+    "skill": "email-assistant",
+    "skillMd": "skills/email-assistant/SKILL.md",
+    "prompt": "Summarize the Brightfield kickoff thread.",
+    "setupFiles": {
+      "email-threads/brightfield-kickoff.md": "Subject: Brightfield kickoff\n\nTom Chen: We are good for Tuesday at 2pm. Please send the kickoff agenda.\nScott: Great. I will send the agenda and proposed milestones.\nTom Chen: Perfect. Please include who needs to attend from our side.\n"
+    },
+    "assertions": [
+      { "type": "response_contains", "text": "kickoff" },
+      { "type": "response_contains", "text": "agenda" },
+      { "type": "response_contains", "text": "next action" }
+    ],
+    "tags": ["smoke"]
+  },
+  {
+    "id": "EMAIL-004",
+    "description": "Report unanswered messages from the inbox snapshot",
+    "skill": "email-assistant",
+    "skillMd": "skills/email-assistant/SKILL.md",
+    "prompt": "Which messages are still waiting on me to reply?",
+    "setupFiles": {
+      "inbox-snapshot.md": "# Inbox Snapshot\n\n- 2026-05-06 14:00 | From: Michael Jewell <michael@jewell.example> | Subject: Follow-up on ClawBox setup | Status: unread\n- 2026-05-08 09:00 | From: Team <team@example.com> | Subject: Internal sync moved to 3pm | Status: unread\n"
+    },
+    "assertions": [
+      { "type": "response_contains", "text": "Michael Jewell" },
+      { "type": "response_contains", "text": "Follow-up on ClawBox setup" }
+    ],
+    "tags": ["smoke"]
+  },
+  {
+    "id": "EMAIL-005",
+    "description": "Fail clearly when the requested thread is missing",
+    "skill": "email-assistant",
+    "skillMd": "skills/email-assistant/SKILL.md",
+    "prompt": "Draft a reply to the missing client thread.",
+    "assertions": [
+      { "type": "response_contains", "text": "cannot find" }
+    ],
+    "tags": ["guardrail"]
+  }
+]

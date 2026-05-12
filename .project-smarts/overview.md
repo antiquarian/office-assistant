@@ -2,8 +2,8 @@
 
 - **Project:** Pre-Built Office Assistant
 - **Status:** active
-- **Current Objective:** Finish the remaining v1 skills and keep the build state durable across sessions and agents.
-- **Active Phase:** implementation
+- **Current Objective:** Finish the installer/test/package work around the completed v1 skills and keep the build state durable across sessions and agents.
+- **Active Phase:** installer-validation
 - **Owner:** Scott
 
 ## Constraints
@@ -15,17 +15,19 @@
 
 ## Important Paths
 
-- `projects/pre-built-office-assistant/SPEC.md`
-- `projects/pre-built-office-assistant/PROJECT.md`
-- `projects/pre-built-office-assistant/BUILD-NOTES.md`
-- `projects/pre-built-office-assistant/TESTING.md`
-- `skills/crm-lite/SKILL.md`
-- `skills/document-assistant/SKILL.md`
-- `skills/email-assistant/`
-- `skills/calendar-assistant/`
+- Canonical repo: `/home/scott/repos/pre-built-office-assistant/`
+- Compatibility symlink: `/home/scott/.openclaw/workspace/projects/pre-built-office-assistant -> /home/scott/repos/pre-built-office-assistant`
+- `/home/scott/repos/pre-built-office-assistant/SPEC.md`
+- `/home/scott/repos/pre-built-office-assistant/PROJECT.md`
+- `/home/scott/repos/pre-built-office-assistant/BUILD-NOTES.md`
+- `/home/scott/repos/pre-built-office-assistant/TESTING.md`
+- `/home/scott/repos/pre-built-office-assistant/skills/`
 
 ## Architecture / Notes
 
 - Product scope and quality bar live in `SPEC.md`.
-- `PROJECT.md` is partially stale: it still shows only phase 1 as complete, while `BUILD-NOTES.md` confirms additional skills were built after that file was last updated.
-- The next scheduled coding push is Monkey's overnight build for `email-assistant` and `calendar-assistant`.
+- Core v1 skills are now bundled in the repo, including `email-assistant` and `calendar-assistant`.
+- Demo mode now copies bundled repo skills rather than pulling from the live workspace.
+- A first working `install.sh` now exists and passed an isolated fake-HOME smoke run.
+- Remaining work is template tuning, end-to-end validation, Docker installer wiring, and packaging.
+- Detached orchestration should avoid `qwen2.5-coder:32b` for now because prior runs emitted pseudo-tool JSON instead of executing real tools.

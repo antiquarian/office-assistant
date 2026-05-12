@@ -36,41 +36,72 @@ RUN useradd -m -s /bin/bash testuser && \
 USER testuser
 WORKDIR /home/testuser
 
-# Installer flags for container environment:
-#   --no-service     skip systemd registration
-#   --skip-google    skip Google Workspace setup
-#   --unattended     non-interactive with defaults
-ENV INSTALLER_FLAGS="--no-service --skip-google --unattended"
-
-# Copy installer script (populated when install.sh exists)
-# In CI/CD this would be COPY install.sh /home/testuser/install.sh
-# For now, create a placeholder that tests the scaffolding
+# Copy repo into the container so the real installer can run from it.
 COPY --chown=testuser:testuser . /home/testuser/installer/
 
-# TODO: Replace placeholder with real installer when install.sh is ready
-RUN echo "#!/bin/bash" > /home/testuser/run-test.sh && \
-    echo "echo '[TEST] Installer test environment ready'" >> /home/testuser/run-test.sh && \
-    echo "echo '[TEST] Would run: bash install.sh \$INSTALLER_FLAGS'" >> /home/testuser/run-test.sh && \
-    echo "echo '[TEST] Checking prerequisites...'" >> /home/testuser/run-test.sh && \
-    echo "which curl && echo '[PASS] curl found' || echo '[FAIL] curl missing'" >> /home/testuser/run-test.sh && \
-    echo "which bash && echo '[PASS] bash found' || echo '[FAIL] bash missing'" >> /home/testuser/run-test.sh && \
-    echo "which git  && echo '[PASS] git found'  || echo '[FAIL] git missing'"  >> /home/testuser/run-test.sh && \
-    echo "echo '[TEST] Prerequisite check complete'" >> /home/testuser/run-test.sh && \
-    chmod +x /home/testuser/run-test.sh
+# Installer flags for this Docker smoke lane intentionally skip service install,
+# Google setup, and model pulls. This tests packaging/scaffolding, not live auth
+# or inference.
+ENV INSTALLER_FLAGS="--no-service --skip-google --unattended --skip-model-pull"
+
+RUN cat > /home/testuser/run-test.sh <<'EOF'
+#!/bin/bash
+set -euo pipefail
+
+WORKSPACE="$HOME/.openclaw/workspace"
+
+pass() {
+  echo "[PASS] $1"
+}
+
+fail() {
+  echo "[FAIL] $1" >&2
+  exit 1
+}
+
+assert_file() {
+  local path="$1"
+  [[ -f "$path" ]] && pass "file exists: $path" || fail "missing file: $path"
+}
+
+assert_dir() {
+  local path="$1"
+  [[ -d "$path" ]] && pass "dir exists: $path" || fail "missing dir: $path"
+}
+
+echo "[TEST] Installer test environment ready"
+echo "[TEST] Running real installer smoke: bash /home/testuser/installer/install.sh $INSTALLER_FLAGS"
+
+bash /home/testuser/installer/install.sh $INSTALLER_FLAGS
+
+echo "[TEST] Verifying installer results"
+command -v openclaw >/dev/null 2>&1 && pass "openclaw on PATH" || fail "openclaw missing from PATH"
+openclaw --version >/dev/null 2>&1 && pass "openclaw --version works" || fail "openclaw --version failed"
+
+assert_dir "$WORKSPACE"
+assert_dir "$WORKSPACE/skills"
+assert_dir "$WORKSPACE/documents/drafts"
+assert_dir "$WORKSPACE/documents/templates"
+
+assert_file "$WORKSPACE/AGENTS.md"
+assert_file "$WORKSPACE/SOUL.md"
+assert_file "$WORKSPACE/USER.md"
+assert_file "$WORKSPACE/HEARTBEAT.md"
+assert_file "$WORKSPACE/MEMORY.md"
+assert_file "$WORKSPACE/TOOLS.md"
+assert_file "$WORKSPACE/INSTALL-NEXT-STEPS.md"
+
+assert_dir "$WORKSPACE/skills/crm-lite"
+assert_dir "$WORKSPACE/skills/document-assistant"
+assert_dir "$WORKSPACE/skills/email-assistant"
+assert_dir "$WORKSPACE/skills/calendar-assistant"
+
+assert_file "$WORKSPACE/documents/templates/proposal.md"
+assert_file "$WORKSPACE/documents/templates/follow-up-email.md"
+
+echo "[TEST] Docker installer smoke completed successfully"
+EOF
+
+RUN chmod +x /home/testuser/run-test.sh
 
 CMD ["/home/testuser/run-test.sh"]
-
-# ─────────────────────────────────────────────────────────────────────────────
-# TODO items (fill in as installer is built):
-#
-# 1. COPY install.sh into the image and run it with INSTALLER_FLAGS
-# 2. Add OLLAMA_MOCK=1 env var and a mock `ollama` binary for testing
-#    the model-detection logic without actually pulling models
-# 3. Add assertions after install:
-#    - openclaw binary exists and responds to `openclaw --version`
-#    - workspace directory created at ~/.openclaw/workspace/
-#    - template files deployed (SOUL.md, AGENTS.md, etc.)
-#    - config file written with correct values
-# 4. Add a CI exit code: exit 0 on all pass, exit 1 on any fail
-# 5. Wire into GitHub Actions or equivalent CI when ready
-# ─────────────────────────────────────────────────────────────────────────────

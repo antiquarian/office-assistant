@@ -5,8 +5,9 @@
 
 set -e
 
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DEMO_DIR="$HOME/.openclaw/workspace-demo"
-WORKSPACE="$HOME/.openclaw/workspace"
+SKILLS_DIR="$PROJECT_ROOT/skills"
 
 echo "Setting up demo workspace at $DEMO_DIR..."
 
@@ -249,21 +250,27 @@ cat > "$DEMO_DIR/tasks/today.md" << 'EOF'
 - [ ] Acme answer library content — Sarah's team delivering May 10
 EOF
 
-# ── Copy skills ───────────────────────────────────────────────────────────────
+# ── Copy bundled skills ──────────────────────────────────────────────────────
 
-if [ -d "$WORKSPACE/skills/crm-lite" ]; then
-  cp -r "$WORKSPACE/skills/crm-lite" "$DEMO_DIR/skills/"
-  echo "✓ crm-lite skill copied"
-fi
-
-if [ -d "$WORKSPACE/skills/document-assistant" ]; then
-  cp -r "$WORKSPACE/skills/document-assistant" "$DEMO_DIR/skills/"
-  echo "✓ document-assistant skill copied"
-  # Copy templates into workspace documents/templates/ so the skill can find them
-  if [ -d "$WORKSPACE/skills/document-assistant/templates" ]; then
-    cp "$WORKSPACE/skills/document-assistant/templates/"*.md "$DEMO_DIR/documents/templates/"
-    echo "✓ document templates copied to workspace"
+copy_skill() {
+  local skill_name="$1"
+  if [ -d "$SKILLS_DIR/$skill_name" ]; then
+    cp -r "$SKILLS_DIR/$skill_name" "$DEMO_DIR/skills/"
+    echo "✓ $skill_name skill copied"
+  else
+    echo "⚠ $skill_name skill not found in project bundle"
   fi
+}
+
+copy_skill "crm-lite"
+copy_skill "document-assistant"
+copy_skill "email-assistant"
+copy_skill "calendar-assistant"
+
+# Copy document templates into workspace documents/templates/ so the skill can find them
+if [ -d "$SKILLS_DIR/document-assistant/templates" ]; then
+  cp "$SKILLS_DIR/document-assistant/templates/"*.md "$DEMO_DIR/documents/templates/"
+  echo "✓ document templates copied to workspace"
 fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────
@@ -276,4 +283,4 @@ echo "Clients: Acme Solutions (active), Riverside Group (active), Northgate Part
 echo "Projects: Acme RFP Automation (Phase 2), Riverside Reporting Automation"
 echo ""
 echo "To run a demo session, point OpenClaw at the demo workspace."
-echo "To tear down: bash teardown-demo.sh"
+echo "To tear down: bash demo/teardown-demo.sh"

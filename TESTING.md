@@ -23,10 +23,15 @@ Create an isolated workspace for testing skills without touching Scott's real wo
 
 ```bash
 mkdir -p ~/.openclaw/workspace-test
-cp ~/.openclaw/workspace/skills/crm-lite ~/.openclaw/workspace-test/skills/ -r
-cp ~/.openclaw/workspace/skills/document-assistant ~/.openclaw/workspace-test/skills/ -r
+mkdir -p ~/.openclaw/workspace-test/skills
+cp -r ./skills/crm-lite ~/.openclaw/workspace-test/skills/
+cp -r ./skills/document-assistant ~/.openclaw/workspace-test/skills/
+cp -r ./skills/email-assistant ~/.openclaw/workspace-test/skills/
+cp -r ./skills/calendar-assistant ~/.openclaw/workspace-test/skills/
 # etc. for each skill being tested
 ```
+
+Run the commands above from the repo root: `/home/scott/repos/pre-built-office-assistant/`.
 
 Then open the OpenClaw Control UI and switch workspace to `~/.openclaw/workspace-test/`
 (or configure a second OpenClaw instance with `--workspace ~/.openclaw/workspace-test`).
@@ -36,9 +41,9 @@ The demo workspace (`~/.openclaw/workspace-demo/`) is set up by `demo/setup-demo
 Run it before demo testing, tear down with `demo/teardown-demo.sh`.
 
 ```bash
-bash skills/pre-built-office-assistant/demo/setup-demo.sh
+bash demo/setup-demo.sh
 # ... run demo tests ...
-bash skills/pre-built-office-assistant/demo/teardown-demo.sh
+bash demo/teardown-demo.sh
 ```
 
 ---
@@ -124,21 +129,14 @@ docker build -f Dockerfile.test -t boa-installer-test .
 docker run --rm boa-installer-test
 ```
 
-**Expected output (stub — until install.sh exists):**
-```
-[TEST] Installer test environment ready
-[PASS] curl found
-[PASS] bash found
-[PASS] git found
-[TEST] Prerequisite check complete
-```
-
-**When install.sh is ready**, the Docker test will:
-1. Run `bash install.sh --no-service --skip-google --unattended`
+**Expected behavior:**
+1. Run `bash install.sh --no-service --skip-google --unattended --skip-model-pull`
 2. Assert OpenClaw installed and responds to `openclaw --version`
-3. Assert workspace directory created with template files
-4. Assert config written correctly
+3. Assert workspace directory created with template files and bundled skills
+4. Assert document templates were deployed
 5. Exit 0 on all pass, exit 1 on any failure
+
+**Current note:** this Docker lane is now wired to the real installer, but still needs an actual `docker build` / `docker run` proof on a machine with Docker available.
 
 ---
 

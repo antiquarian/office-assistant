@@ -295,12 +295,18 @@ The installer deploys a set of template files into `~/.openclaw/workspace/`. The
 
 ## 7. Installer Script
 
+### Current implementation status
+- `install.sh` now exists as a first working pass.
+- Current implemented behavior: unattended onboarding path, workspace scaffolding, bundled skill/template deployment, model recommendation, optional model pull, optional gateway service setup, and demo passthrough flags.
+- Current known gap: the Docker smoke lane is wired to the real installer, but it still needs an actual container build/run proof on a machine with Docker or Podman.
+- Google Workspace setup and deeper end-to-end validation still need a fuller pass before calling the installer finished.
+
 ### Philosophy
 **Scott runs this installer - not the client.** The installer needs to be fast, clean, and reliable for a practitioner deploying on behalf of a client. It doesn't need to be bulletproof for a non-technical end user running it blind.
 
 OpenClaw already has its own configuration process (model selection, API keys, gateway setup, assistant name). We run that first and let it do its job. Our installer then reads what OpenClaw configured and only asks for what it doesn't already know. No duplication, no conflicting prompts.
 
-### What it does (in order):
+### Target behavior (in order)
 1. **Checks prerequisites** - Linux, bash, curl, node/nvm
 2. **Installs OpenClaw** (or detects existing install and updates if needed)
 3. **Runs OpenClaw's own setup/config flow** - `openclaw setup` or equivalent; handles model selection, API keys, assistant name, gateway config
@@ -319,6 +325,17 @@ OpenClaw already has its own configuration process (model selection, API keys, g
 12. **Final check** - runs `openclaw status` and confirms everything is green
 13. **First-run message** - prints instructions for opening the Control UI and getting started
 
+### Current first-pass behavior
+1. Checks Linux + basic shell prerequisites and verifies repo assets are present.
+2. Detects OpenClaw or installs it via the official installer.
+3. Uses unattended `openclaw onboard` in scripted mode, with bootstrap creation skipped because this project scaffolds the workspace itself.
+4. Detects Ollama if present and recommends a local model based on RAM/GPU.
+5. Optionally pulls the recommended model unless `--skip-model-pull` is used.
+6. Scaffolds the target workspace with bundled templates, skills, and document templates without overwriting existing files.
+7. Writes `INSTALL-NEXT-STEPS.md` into the target workspace.
+8. Optionally installs/starts the gateway service unless `--no-service` is used.
+9. In `--no-service` runs, verifies the scaffold directly instead of producing noisy gateway-status failures.
+
 ### Design rules:
 - Idempotent - safe to re-run (upgrades rather than breaks)
 - Never overwrites user-modified workspace files; skips with a notice
@@ -336,13 +353,13 @@ OpenClaw already has its own configuration process (model selection, API keys, g
 
 | Skill | Status | Notes |
 |---|---|---|
-| `email-assistant` | 🔴 Not started | Gmail via gws-sa; inbox triage + draft/send |
-| `calendar-assistant` | 🔴 Not started | Google Calendar via gws-sa; view/create/remind |
-| `document-assistant` | 🔴 Not started | Template engine + draft management |
-| `crm-lite` | 🔴 Not started | Markdown CRM; read/write/search/log |
-| `meeting-prep` | 🔴 Not started | Pre-meeting brief: CRM notes + email threads + project status |
-| `follow-up-sequencer` | 🔴 Not started | Track sent proposals; draft nudge emails at day 3/7/14 |
-| `meeting-intelligence` | 🔴 Not started | Audio recordings or text transcripts → summary + action items + CRM log |
+| `email-assistant` | ✅ Built | Gmail via gws-sa; inbox triage + draft/send |
+| `calendar-assistant` | ✅ Built | Google Calendar via gws-sa; view/create/remind |
+| `document-assistant` | ✅ Built | Template engine + draft management |
+| `crm-lite` | ✅ Built | Markdown CRM; read/write/search/log |
+| `meeting-prep` | ✅ Built | Pre-meeting brief: CRM notes + email threads + project status |
+| `follow-up-sequencer` | ✅ Built | Track sent proposals; draft nudge emails at day 3/7/14 |
+| `meeting-intelligence` | ✅ Built | Audio recordings or text transcripts → summary + action items + CRM log |
 
 ### v2 Skills (backlog)
 
@@ -544,14 +561,16 @@ The demo persona (Jordan Lee / Greenleaf Consulting) is the default. In a future
 - `--no-service` — skips systemd service registration (not available in standard Docker)
 - `--skip-google` — skips Google Workspace OAuth/service-account setup (no browser in container)
 - `--unattended` — non-interactive mode with defaults
+- `--skip-model-pull` — skips model downloads so the container lane stays a fast packaging/scaffold smoke test
 
 **What Docker tests cover:**
-- Prerequisite detection (curl, node, nvm)
-- OpenClaw install/update
-- Ollama install detection (mock or skip)
-- Hardware detection logic
-- Workspace scaffold (template file deployment)
-- Config wizard in unattended mode
+- Prerequisite detection (curl, bash, git, OpenClaw path)
+- OpenClaw install/update path when needed
+- Unattended onboarding path
+- Ollama detection path while skipping model pulls
+- Hardware detection/recommendation logic
+- Workspace scaffold (template file deployment + bundled skills)
+- Basic installer assertions via the container smoke script
 
 **What Docker does NOT test:**
 - Systemd service registration
@@ -566,6 +585,8 @@ docker run --rm boa-installer-test
 ```
 
 See `Dockerfile.test` in this directory.
+
+**Current status:** the Docker smoke lane is wired to the real installer, but it still needs a live `docker build` / `docker run` proof on a machine with Docker or Podman available.
 
 ---
 

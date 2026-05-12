@@ -1,0 +1,85 @@
+[
+  {
+    "id": "CRM-001",
+    "description": "Create a new client — happy path",
+    "skill": "crm-lite",
+    "skillMd": "skills/crm-lite/SKILL.md",
+    "tags": ["smoke"],
+    "prompt": "Create a new client: Brightfield Media, contact Tom Chen, tom@brightfield.com, status Active",
+    "assertions": [
+      { "type": "file_exists",   "path": "crm/clients/brightfield-media.md", "description": "Client file created" },
+      { "type": "file_contains", "path": "crm/clients/brightfield-media.md", "text": "Brightfield Media", "description": "Client name present" },
+      { "type": "file_contains", "path": "crm/clients/brightfield-media.md", "text": "Tom Chen", "description": "Contact name present" },
+      { "type": "file_contains", "path": "crm/clients/brightfield-media.md", "text": "tom@brightfield.com", "description": "Email present" },
+      { "type": "file_contains", "path": "crm/clients/brightfield-media.md", "text": "Active", "description": "Status present" }
+    ]
+  },
+  {
+    "id": "CRM-002",
+    "description": "Log an interaction — appends to existing client file",
+    "skill": "crm-lite",
+    "skillMd": "skills/crm-lite/SKILL.md",
+    "tags": ["smoke"],
+    "setupFiles": {
+      "crm/clients/brightfield-media.md": "# Brightfield Media\n- **Contact:** Tom Chen (tom@brightfield.com)\n- **Status:** Active\n- **Since:** 2026-05-05\n- **Last Contact:** 2026-05-05\n\n## Notes\n\n## Interaction Log\n"
+    },
+    "prompt": "Log that I called Brightfield Media today and we agreed on a kickoff call next Tuesday",
+    "assertions": [
+      { "type": "file_contains", "path": "crm/clients/brightfield-media.md", "text": "kickoff", "description": "Kickoff mention logged", "caseSensitive": false },
+      { "type": "file_contains", "path": "crm/clients/brightfield-media.md", "text": "Interaction Log", "description": "Interaction Log section still present" }
+    ]
+  },
+  {
+    "id": "CRM-003",
+    "description": "Create a new vendor",
+    "skill": "crm-lite",
+    "skillMd": "skills/crm-lite/SKILL.md",
+    "prompt": "Create a new vendor: CloudPrint Co, billing@cloudprint.com",
+    "assertions": [
+      { "type": "file_exists",   "path": "crm/vendors/cloudprint-co.md", "description": "Vendor file created" },
+      { "type": "file_contains", "path": "crm/vendors/cloudprint-co.md", "text": "CloudPrint Co", "description": "Vendor name present" },
+      { "type": "file_contains", "path": "crm/vendors/cloudprint-co.md", "text": "billing@cloudprint.com", "description": "Email present" }
+    ]
+  },
+  {
+    "id": "CRM-004",
+    "description": "View a client record",
+    "skill": "crm-lite",
+    "skillMd": "skills/crm-lite/SKILL.md",
+    "setupFiles": {
+      "crm/clients/brightfield-media.md": "# Brightfield Media\n- **Contact:** Tom Chen (tom@brightfield.com)\n- **Status:** Active\n- **Since:** 2026-05-01\n- **Last Contact:** 2026-05-01\n\n## Notes\nDiscussed AI workflow rollout.\n\n## Interaction Log\n- 2026-05-01: Initial call\n"
+    },
+    "prompt": "Show me the Brightfield Media record",
+    "assertions": [
+      { "type": "response_contains", "text": "Brightfield Media", "description": "Client name in response" },
+      { "type": "response_contains", "text": "Tom Chen", "description": "Contact name in response" }
+    ]
+  },
+  {
+    "id": "CRM-005",
+    "description": "Duplicate client prevention — guardrail",
+    "skill": "crm-lite",
+    "skillMd": "skills/crm-lite/SKILL.md",
+    "tags": ["guardrail"],
+    "setupFiles": {
+      "crm/clients/brightfield-media.md": "# Brightfield Media\n- **Contact:** Tom Chen (tom@brightfield.com)\n- **Status:** Active\n- **Since:** 2026-05-01\n- **Last Contact:** 2026-05-01\n\n## Notes\n\n## Interaction Log\n"
+    },
+    "prompt": "Create a new client: Brightfield Media, contact Tom Chen, tom@brightfield.com",
+    "assertions": [
+      { "type": "file_not_exists", "path": "crm/clients/brightfield-media-2.md", "description": "No duplicate file created" },
+      { "type": "response_contains", "text": "already", "description": "Agent mentions existing record", "caseSensitive": false }
+    ]
+  },
+  {
+    "id": "CRM-006",
+    "description": "Create a project record",
+    "skill": "crm-lite",
+    "skillMd": "skills/crm-lite/SKILL.md",
+    "prompt": "Create a new project: Brightfield AI Rollout, client Brightfield Media, status Active, start date 2026-06-01",
+    "assertions": [
+      { "type": "file_exists",   "path": "crm/projects/brightfield-ai-rollout.md", "description": "Project file created" },
+      { "type": "file_contains", "path": "crm/projects/brightfield-ai-rollout.md", "text": "Brightfield", "description": "Project name present" },
+      { "type": "file_contains", "path": "crm/projects/brightfield-ai-rollout.md", "text": "Active", "description": "Status present" }
+    ]
+  }
+]
